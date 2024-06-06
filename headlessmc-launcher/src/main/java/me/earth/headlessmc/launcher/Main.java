@@ -24,16 +24,29 @@ import me.earth.headlessmc.launcher.version.VersionUtil;
 import me.earth.headlessmc.logging.LogLevelUtil;
 import me.earth.headlessmc.logging.LoggingHandler;
 import me.earth.headlessmc.logging.SimpleLog;
-
+import me.earth.headlessmc.launcher.launch.LaunchOptions;
 import java.io.IOException;
 
 @CustomLog
 @UtilityClass
 public final class Main {
     public static void main(String[] args) {
+        String username = "Offline"; // Set a default value
+
+        for (int i = 0; i < args.length; i++) {
+            if ("-username".equals(args[i])) {
+                i++;
+                if (i < args.length) {
+                    username = args[i];
+                } else {
+                    System.err.println("-username requires a parameter");
+                    // Don't exit the program, just continue with the default value
+                }
+            }
+        }
         Throwable throwable = null;
         try {
-            runHeadlessMc(args);
+            runHeadlessMc(username,args);
         } catch (Throwable t) {
             throwable = t;
         } finally {
@@ -57,12 +70,12 @@ public final class Main {
         }
     }
 
-    private void runHeadlessMc(String... args) throws IOException {
+    private void runHeadlessMc(String username, String... args) throws IOException {
         LoggingHandler.apply();
         val files = FileManager.mkdir("HeadlessMC");
         val configs = Service.refresh(new ConfigService(files));
         LogLevelUtil.trySetLevel(
-            configs.getConfig().get(HmcProperties.LOGLEVEL, "INFO"));
+                configs.getConfig().get(HmcProperties.LOGLEVEL, "INFO"));
 
         val in = new CommandLineImpl();
         val hmc = new HeadlessMcImpl(new SimpleLog(), configs, in);
@@ -71,14 +84,13 @@ public final class Main {
         val mcFiles = MinecraftFinder.find(configs.getConfig(), os);
         val versions = Service.refresh(new VersionService(mcFiles));
         val javas = Service.refresh(new JavaService(configs));
-
         val validator = new AccountValidator();
         val accountStore = new AccountStore(files, configs);
-        val accounts = new AccountManager(accountStore, validator, new OfflineChecker(configs));
+        val accounts = new AccountManager(accountStore, validator, new OfflineChecker(configs), username);
 
         val launcher = new Launcher(hmc, versions, mcFiles, files,
-                                    new ProcessFactory(mcFiles, configs, os), configs,
-                                    javas, accounts, validator);
+                new ProcessFactory(mcFiles, configs, os), configs,
+                javas, accounts, validator);
         LauncherApi.setLauncher(launcher);
         deleteOldFiles(launcher);
         versions.refresh();
@@ -104,7 +116,7 @@ public final class Main {
                     FileUtil.delete(file);
                 } catch (IOException ioe) {
                     log.error("Couldn't delete " + file.getName()
-                                  + " : " + ioe.getMessage());
+                            + " : " + ioe.getMessage());
                 }
             }
         }

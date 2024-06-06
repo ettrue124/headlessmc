@@ -38,6 +38,7 @@ public class LauncherMock {
         val validator = new AccountValidator();
         val accounts = new DummyAccountManager(store, validator);
 
+
         INSTANCE = new Launcher(hmc, versions, mcFiles, fileManager,
                                 new MockProcessFactory(mcFiles, configs, os), configs,
                                 javas, accounts, validator);
@@ -46,9 +47,10 @@ public class LauncherMock {
     }
 
     private static final class DummyAccountManager extends AccountManager {
+
         public DummyAccountManager(AccountStore accountStore,
                                    AccountValidator validator) {
-            super(accountStore, validator, new TestOfflineChecker());
+            super(accountStore, validator, new TestOfflineChecker(), "Offline");
         }
 
         @Override

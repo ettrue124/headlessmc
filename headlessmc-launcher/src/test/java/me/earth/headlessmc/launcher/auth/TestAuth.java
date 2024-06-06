@@ -32,7 +32,8 @@ public class TestAuth {
         val store = new AccountStore(LauncherMock.INSTANCE.getFileManager(),
                                      LauncherMock.INSTANCE);
         val checker = new TestOfflineChecker();
-        val manager = new AccountManager(store, VALIDATOR, checker);
+        String username = "Offline";
+        val manager = new AccountManager(store, VALIDATOR, checker, username);
         val account = manager.login(config);
         log.info(account.toString());
         assertDoesNotThrow(() -> VALIDATOR.validate(account));

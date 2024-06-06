@@ -25,7 +25,8 @@ public class AccountManager implements Iterable<Account> {
     private final OfflineChecker offlineChecker;
     @Getter
     private Account lastAccount;
-
+    @Getter
+    private final String username;
     public Account login(Config config) throws AuthException {
         log.debug("Attempting to login...");
         var acc = accountStore.load();
@@ -44,12 +45,12 @@ public class AccountManager implements Iterable<Account> {
         }
 
         if (offlineChecker.isOffline()) {
-            return new Account("Offline", OFFLINE_UUID, "", "", "", "");
+            return new Account(username, OFFLINE_UUID, "", "", "", "");
         }
 
         log.warning("No valid account found!");
         throw new AuthException("You can't play the game without an account!" +
-                                    " Please use the login command.");
+                " Please use the login command.");
     }
 
     public Account login(String email, String password) throws AuthException {
@@ -102,7 +103,7 @@ public class AccountManager implements Iterable<Account> {
             accountStore.save(account);
         } catch (IOException e) {
             log.error("Failed to save account " + account + " : "
-                          + e.getMessage());
+                    + e.getMessage());
         }
     }
 
@@ -111,7 +112,7 @@ public class AccountManager implements Iterable<Account> {
         val authenticator = new MicrosoftAuthenticator();
         try {
             val result = authenticator.loginWithRefreshToken(
-                account.getRefreshToken());
+                    account.getRefreshToken());
             log.debug("Refreshed account " + account + "successfully");
             return Optional.of(toAccount(result));
         } catch (MicrosoftAuthenticationException e) {
@@ -122,11 +123,11 @@ public class AccountManager implements Iterable<Account> {
 
     private Account toAccount(MicrosoftAuthResult result) {
         return new Account(result.getProfile().getName(),
-                           result.getProfile().getId(),
-                           result.getAccessToken(),
-                           result.getRefreshToken(),
-                           result.getXuid(),
-                           result.getClientId());
+                result.getProfile().getId(),
+                result.getAccessToken(),
+                result.getRefreshToken(),
+                result.getXuid(),
+                result.getClientId());
     }
 
 }

@@ -23,18 +23,18 @@ public class LaunchCommand extends AbstractVersionCommand {
     public LaunchCommand(Launcher launcher) {
         super(launcher, "launch", "Launches the game.");
         args.put("<version/id>", "Name or id of the version to launch." +
-            " If you use the id you need to use the -id flag as well.");
+                " If you use the id you need to use the -id flag as well.");
         args.put("-id",
-                 "Use if you specified an id instead of a version name.");
+                "Use if you specified an id instead of a version name.");
         args.put("-commands",
-                 "Starts the game with the built-in command line support.");
+                "Starts the game with the built-in command line support.");
         args.put("-lwjgl", "Removes lwjgl code, causing Minecraft" +
-            " not to render anything.");
+                " not to render anything.");
         args.put("-jndi", "Patches the Log4J vulnerability.");
         args.put("-lookup", "Patches the Log4J vulnerability even harder.");
         args.put("-paulscode", "Removes some error messages from the" +
-            " PaulsCode library which may annoy you if you started the" +
-            " game with the -lwjgl flag.");
+                " PaulsCode library which may annoy you if you started the" +
+                " game with the -lwjgl flag.");
         // TODO: is this really necessary?
         args.put("-noout", "Doesn't print Minecrafts output to the console.");
         args.put("-quit", "Quit HeadlessMc after launching the game.");
@@ -43,7 +43,7 @@ public class LaunchCommand extends AbstractVersionCommand {
 
     @Override
     public void execute(Version version, String... args)
-        throws CommandException {
+            throws CommandException {
         val uuid = UUID.randomUUID();
         ctx.log("Launching version " + version.getName() + ", " + uuid);
         val files = ctx.getFileManager().createRelative(uuid.toString());
@@ -52,12 +52,12 @@ public class LaunchCommand extends AbstractVersionCommand {
         int status = 0;
         try {
             val process = ctx.getProcessFactory().run(
-                LaunchOptions.builder()
-                             .version(version)
-                             .launcher(ctx)
-                             .files(files)
-                             .parseFlags(ctx, quit, args)
-                             .build());
+                    LaunchOptions.builder()
+                            .version(version)
+                            .launcher(ctx)
+                            .files(files)
+                            .parseFlags(ctx, quit, args)
+                            .build());
             if (quit) {
                 System.exit(0);
             }
@@ -73,14 +73,14 @@ public class LaunchCommand extends AbstractVersionCommand {
             status = -1;
             e.printStackTrace();
             ctx.log(String.format(
-                "Couldn't launch %s: %s", version.getName(), e.getMessage()));
+                    "Couldn't launch %s: %s", version.getName(), e.getMessage()));
             if (ctx.getConfig().get(RE_THROW_LAUNCH_EXCEPTIONS, false)) {
                 throw new RuntimeException(e);
             }
         } catch (Throwable t) {
             status = -1;
             val msg = String.format(
-                "Couldn't launch %s: %s", version.getName(), t.getMessage());
+                    "Couldn't launch %s: %s", version.getName(), t.getMessage());
             log.error(msg);
             ctx.log(msg);
             t.printStackTrace();
@@ -89,14 +89,14 @@ public class LaunchCommand extends AbstractVersionCommand {
             // for some reason both ShutdownHooks and File.deleteOnExit are
             // not really working, that's why we Main.deleteOldFiles, too.
             if (!CommandUtil.hasFlag("-keep", args)
-                && !ctx.getConfig().get(LauncherProperties.KEEP_FILES, false)) {
+                    && !ctx.getConfig().get(LauncherProperties.KEEP_FILES, false)) {
                 try {
                     log.info("Deleting " + files.getBase().getName());
                     FileUtil.delete(files.getBase());
                 } catch (IOException e) {
                     log.error("Couldn't delete files of game "
-                                  + files.getBase().getName()
-                                  + ": " + e.getMessage());
+                            + files.getBase().getName()
+                            + ": " + e.getMessage());
                 }
             }
 
