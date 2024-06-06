@@ -21,7 +21,7 @@ launch the bytecode of the games libraries can be modified. HeadlessMc aims to u
 *   patch the Log4J vulnerability.
 
 ## How to use
-t
+
 All you need is the `headlessmc-launcher.jar` file and java &geq; 8 installed. The launcher will start after you
 executed `java -jar headlessmc-launcher.jar` in a terminal of your choice. Double-clicking the jar is not supported.
 After that HeadlessMc will create a `HeadlessMc/config.properties` file. Edit that file, create a key
